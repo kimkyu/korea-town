@@ -1,0 +1,18 @@
+package Scenes;
+import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.Input;import org.newdawn.slick.SlickException;import org.newdawn.slick.state.StateBasedGame;
+import Main.ProjectMain;import forSlick2D.BasicScene;
+public class TitleScene extends BasicScene {  int cnt;  boolean startReady;
+ public TitleScene() {  // TODO Auto-generated constructor stub }
+ public TitleScene(int id) {  // TODO Auto-generated constructor stub    super(id); }  @Override public void init(GameContainer arg0, StateBasedGame arg1)   throws SlickException {  // TODO Auto-generated method stub
+  super.init(arg0, arg1); }
+  //render 함수 내에, awt와 같은 방식으로 그림 그려주는 내용을 코딩해도 무방하다. //랄까, GameObject의 render는 이런 내용이 된다 보통. @Override public void render(GameContainer arg0, StateBasedGame arg1, Graphics g)   throws SlickException {  // TODO Auto-generated method stub
+  super.render(arg0, arg1, g);
+  g.drawImage(titlebg, 0, 0);  if(cnt%40<20)   g.drawImage(pushspace, 120, 360);   }
+ @Override public void update(GameContainer arg0, StateBasedGame arg1, int arg2)   throws SlickException {  // TODO Auto-generated method stub
+  super.update(arg0, arg1, arg2);    cnt++; }
+  //이미지는 enter할 때 생성하고 leave할 때 해제한다. Image titlebg; Image pushspace; @Override public void enter(GameContainer container, StateBasedGame game)   throws SlickException {  // TODO Auto-generated method stub  super.enter(container, game);    cnt = 0;  titlebg = new Image("rsc/title.png");  pushspace = new Image("rsc/pushspace.png");    startReady = false; }
+ @Override public void leave(GameContainer container, StateBasedGame game)   throws SlickException {  // TODO Auto-generated method stub    super.leave(container, game);    titlebg.destroy();  titlebg = null;    pushspace.destroy();  pushspace = null; }
+ @Override public void keyPressed(int key, char c) {  // TODO Auto-generated method stub  super.keyPressed(key, c);
+  if(key==Input.KEY_SPACE){   startReady = true;  } }
+ @Override public void keyReleased(int key, char c) {  // TODO Auto-generated method stub  super.keyReleased(key, c);    if(key==Input.KEY_SPACE && startReady){   game.enterState(ProjectMain.STATE_GAME);  } }
+}
