@@ -1,0 +1,15 @@
+package prefab;
+import java.util.Vector;
+import org.newdawn.slick.Color;import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.geom.Point;import org.newdawn.slick.geom.Rectangle;import org.newdawn.slick.state.StateBasedGame;
+import Scenes.GameScene;
+import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public class CoinItem extends GameItem {
+ public CoinItem() {  // TODO Auto-generated constructor stub  super(); }
+ public CoinItem(BasicScene scene) {  super(scene);  // TODO Auto-generated constructor stub }
+ public CoinItem(BasicScene scene, float posX, float posY, int tag) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub    try{      img = new Image("rsc/game/item0.png");     }catch(Exception e){   e.printStackTrace();  }
+  this.posX = posX;  this.posY = posY;  degree = 0;  speed = 5.0f;  nowFrame = 0; }
+ @Override public void update() {  // TODO Auto-generated method stub  super.update();    cnt++;    Point pos = new Point(posX, posY);  pos = BasicScene.getNextPos(posX, posY, degree, speed);    posX = pos.getX();  posY = pos.getY();    posX -= 1.2f;  speed -= 0.1f;    rect = new Rectangle(posX-36/2, posY-36/2, 36, 36);    //아이템이 플레이어와 닿았을 때 처리  Player getPlayer = checkEat();  if( getPlayer!=null ){
+   //플레이어에게 먹혀서 득점 및 소멸   getPlayer.setMyScore(getPlayer.getMyScore() + 30);   scene.removeChild(this);   ((GameScene)scene).playSound(0);//아이템겟  }  else  if(posY>530){//화면 아래로 떨어져서 소멸  //if(posX<-50 || posX>690 || posY<-50 || posY>530){//화면 밖으로 나가서 소멸      scene.removeChild(this);//중복으로 삭제 요청이 들어가면 중복은 무시되니 else가 없어도 되긴 하지만 로직은 분명하게 해 주는게 좋다.  } }
+ @Override public void render(GameContainer cont, StateBasedGame state, Graphics g) {  // TODO Auto-generated method stub  super.render(cont, state, g);    nowFrame = ((cnt/3)%7);    Image _img = img.getSubImage( nowFrame*36, 0, 36, 36);  _img.drawCentered(posX, posY);
+  if(scene.getDebug()){   g.setColor(Color.red);   g.draw(rect);  } }
+ @Override protected Player checkEat(){    Vector<GameObject> players = scene.getChildrenByName("PLAYER");  if(players.size()==0)   return null;    for(int i=0;i<players.size(); i++){      Player _player = (Player)players.get(i);   if(_player.getRect().intersects(this.rect)){        return _player;   }  }    return null; }}
