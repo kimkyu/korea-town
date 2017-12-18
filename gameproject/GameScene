@@ -1,0 +1,51 @@
+package Scenes;
+import java.util.Random;import java.util.Vector;
+import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Input;import org.newdawn.slick.SlickException;import org.newdawn.slick.Sound;import org.newdawn.slick.state.StateBasedGame;
+import prefab.Player;import prefab.background.BackGround;import prefab.background.Cloud;import prefab.background.WaveBg;import prefab.scenario.Scenario2;import prefab.ui.Clear;import prefab.ui.GameOver;import Main.ProjectMain;import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public class GameScene extends BasicScene {
+ //콘트롤 int keyBuff;//키보드 입력을 담는 버퍼 int padBuff;//게임패드 입력을 담는 버퍼 int keyShootBuff;//키보드의 발사버튼 입력을 담는 버퍼 int padShootBuff;//게임패드의 발사버튼 입력을 담는 버퍼  static final public int CONTROL_UP = 0x0001; static final public int CONTROL_DOWN = 0x0002; static final public int CONTROL_LEFT = 0x0004; static final public int CONTROL_RIGHT = 0x0008; static final public int CONTROL_SHOOT = 0x0010;  //게임 제어를 위해 추가하는 변수 Random rand = new Random(); int cnt;  boolean p1Gameover;//플레이어 1 게임 오버 boolean p2Gameover;//플레이어 2 게임 오버
+  //사운드 Sound efct[] = new Sound[10]; float volume;  public GameScene() {  // TODO Auto-generated constructor stub  super();   }
+ public GameScene(int id) {  // TODO Auto-generated constructor stub    super(id); }  @Override public void init(GameContainer arg0, StateBasedGame arg1)   throws SlickException {  // TODO Auto-generated method stub
+  game = arg1;  gc = arg0;   }
+ @Override public void render(GameContainer arg0, StateBasedGame arg1, Graphics g)   throws SlickException {  // TODO Auto-generated method stub  super.render(arg0, arg1, g);   }
+ @Override public void update(GameContainer arg0, StateBasedGame arg1, int arg2)   throws SlickException {  // TODO Auto-generated method stub  super.update(arg0, arg1, arg2);    if(super.isPaused())   return;    if( start2Player() ){//2플레이어 시작 여부 판단
+   //이상의 조건이 달성되어 2플레이어 생성   Player player2 = new Player(this, 0, 320, 1);   player2.setName("PLAYER");   addChild(player2);  }    cnt++; }
+ @Override public int getID() {  // TODO Auto-generated method stub  return this.id; }
+ @Override public void controllerButtonPressed(int controller, int button) {  // TODO Auto-generated method stub  super.controllerButtonPressed(controller, button);    if(1<=button && button<=4)   padShootBuff = CONTROL_SHOOT; }
+ @Override public void controllerButtonReleased(int controller, int button) {  // TODO Auto-generated method stub  super.controllerButtonReleased(controller, button);
+  if(1<=button && button<=4){   padShootBuff = 0;
+   if( this.getChildrenByName("PLAYER").size()==0 && p2Gameover ){        //현재 화면에 아무도 없고 p2Gameover인데 게임패드 버튼이 눌렸다면 타이틀로    game.enterState(ProjectMain.STATE_TITLE);   }  } }
+ @Override public void controllerDownPressed(int controller) {  // TODO Auto-generated method stub  super.controllerDownPressed(controller);
+  padBuff |= CONTROL_DOWN; }
+ @Override public void controllerDownReleased(int controller) {  // TODO Auto-generated method stub  super.controllerDownReleased(controller);
+  padBuff &=~ CONTROL_DOWN; }
+ @Override public void controllerLeftPressed(int controller) {  // TODO Auto-generated method stub  super.controllerLeftPressed(controller);
+  padBuff |= CONTROL_LEFT; }
+ @Override public void controllerLeftReleased(int controller) {  // TODO Auto-generated method stub  super.controllerLeftReleased(controller);
+  padBuff &=~ CONTROL_LEFT; }
+ @Override public void controllerRightPressed(int controller) {  // TODO Auto-generated method stub  super.controllerRightPressed(controller);
+  padBuff |= CONTROL_RIGHT; }
+ @Override public void controllerRightReleased(int controller) {  // TODO Auto-generated method stub  super.controllerRightReleased(controller);
+  padBuff &=~ CONTROL_RIGHT; }
+ @Override public void controllerUpPressed(int controller) {  // TODO Auto-generated method stub  super.controllerUpPressed(controller);
+  padBuff |= CONTROL_UP; }
+ @Override public void controllerUpReleased(int controller) {  // TODO Auto-generated method stub  super.controllerUpReleased(controller);
+  padBuff &=~ CONTROL_UP; }
+ @Override public void keyPressed(int key, char c) {  // TODO Auto-generated method stub  super.keyPressed(key, c);    switch (key) {  case Input.KEY_UP:   keyBuff |= CONTROL_UP;   break;  case Input.KEY_DOWN:   keyBuff |= CONTROL_DOWN;   break;  case Input.KEY_LEFT:   keyBuff |= CONTROL_LEFT;   break;  case Input.KEY_RIGHT:   keyBuff |= CONTROL_RIGHT;   break;  case Input.KEY_SPACE:   keyShootBuff = CONTROL_SHOOT;   break;  } }
+ @Override public void keyReleased(int key, char c) {  // TODO Auto-generated method stub  super.keyReleased(key, c);
+  switch (key) {  case Input.KEY_UP:   keyBuff &=~ CONTROL_UP;   break;  case Input.KEY_DOWN:   keyBuff &=~ CONTROL_DOWN;   break;  case Input.KEY_LEFT:   keyBuff &=~ CONTROL_LEFT;   break;  case Input.KEY_RIGHT:   keyBuff &=~ CONTROL_RIGHT;   break;  case Input.KEY_SPACE:   keyShootBuff = 0;      if( this.getChildrenByName("PLAYER").size()==0 && p1Gameover ){        //현재 화면에 아무도 없고 p1Gameover인데 스페이스키가 눌렸다면 타이틀로    game.enterState(ProjectMain.STATE_TITLE);   }   break;     } }
+ @Override public void enter(GameContainer container, StateBasedGame game)   throws SlickException {  // TODO Auto-generated method stub  super.enter(container, game);
+  cnt = 0;    //배경 초기화  createBackGround();    //플레이어(1) 초기화  Player player = new Player(this, 0, 160, 0);  player.setName("PLAYER");  addChild(player);
+  p1Gameover = false;  p2Gameover = false;      //게임 시나리오 불러들인다//  Scenario1 scenario = new Scenario1(this);//  scenario.setName("SCENARIO");//  addChild(scenario);  Scenario2 scenario = new Scenario2(this);  scenario.setName("SCENARIO");  addChild(scenario);    //사운드 로드  efct[0] = new Sound("rsc/sound/effect_01.ogg");//아이템겟  efct[1] = new Sound("rsc/sound/endgame.ogg");//파괴  efct[2] = new Sound("rsc/sound/se_crash.ogg");//소파  efct[3] = new Sound("rsc/sound/se_kwakaka.ogg");//대파  efct[4] = new Sound("rsc/sound/se_shoot.ogg");//슛  efct[5] = new Sound("rsc/sound/effect_unswap.ogg");//??  volume = 0.4f; }
+ @Override public void leave(GameContainer container, StateBasedGame game)   throws SlickException {  // TODO Auto-generated method stub  super.leave(container, game);
+ }
+   //구름의 종류를 지정할 수 있는 생성자를 추가, 이 종류에 따라 생성자 안에서 그림과 속도, zorder를 다르게 지정해줍니다.
+ private void createBackGround(){
+  //원경  BackGround bg1 = new BackGround(this, 0.0f, 0.0f, 0);  BackGround bg2 = new BackGround(this, 639.0f, 0.0f, 0);  bg2.isFlip = true;    addChild(bg1);  addChild(bg2);    boolean bgmode = false;  //bgmode = false;시에 구름 삭제  if(bgmode){      //구름 4열,끝의 숫자는 구름의 숫자   for(int i=0;i<6;i++){    Cloud cl = new Cloud(this, i*128, 420, 0, 3);    addChild(cl);   }
+   //구름 3열   for(int i=0;i<7;i++){    Cloud cl = new Cloud(this, i*106.6f, 400, 0, 2);    addChild(cl);   }
+   //구름 2열   for(int i=0;i<9;i++){    Cloud cl = new Cloud(this, i*80, 380, 0, 1);    addChild(cl);   }
+   //구름 1열   for(int i=0;i<12;i++){    Cloud cl = new Cloud(this, i*64, 350, 0, 0);    addChild(cl);   }     }else{      WaveBg wbg = new WaveBg(this);   addChild(wbg);  } }
+ public int getKeyBuff(){    return this.keyBuff; } public int getPadBuff(){    return this.padBuff; } public int getKeyShootBuff(){    return this.keyShootBuff; } public int getPadShootBuff(){    return this.padShootBuff; }  public void setGameover(int tag){    if(tag==0){   p1Gameover = true;  }    if(tag==1){   p2Gameover = true;  }    if( this.getChildrenByName("PLAYER").size()==0 ) {      //현재 화면에 플레이어 캐릭터가 없으면 게임오버 메시지 출력      GameOver gameover = new GameOver(this, 0,0,0);   gameover.setName("GAMEOVER");   addChild(gameover);  } }  public int getGameover(){
+  int ret = 0;
+  GameObject temp = getChildByName("GAMEOVER");    if(temp==null)//게임오버 상태 아님   return 1;    return ret; }
+ public boolean start2Player(){    boolean p2go = false;    //현재 2플레이어가 없는데 패드 버튼이 눌렸고 2p게임오버가 아니면 2플레이어를 생성한다.  if( padShootBuff == CONTROL_SHOOT //패드 버튼이 눌렸고   && !p2Gameover){ //2플레이어가 게임오버되지 않았음      Vector<GameObject> players = this.getChildrenByName("PLAYER");         if( players.size()==1 ){//플레이어가 하나만 있는데    if( players.get(0).getTag()==0 ){//그게 1플레이어이거나     p2go = true;    }   }   if( players.size()==0 ) //플레이어가 아무도 없거나    p2go = true;     }    if( p2go && this.getChildByName("GAMEOVER")!=null ){      //플레이어 2 스타트가 되고 게임오버 메시지가 화면에 있다면 게임오버 메시지를 삭제   this.removeChild(this.getChildByName("GAMEOVER"));  }    return p2go; }  public void playSound(int idx){    efct[idx].play(); }  public void setClear(){    Clear clear = new Clear(this, 320, 240, 0);  addChild(clear);    if(getChildByName("SCENARIO")!=null){   ((Scenario2)getChildByName("SCENARIO")).stopMusic();   removeChild(getChildByName("SCENARIO"));  } } public void forceEnd(){    game.enterState(ProjectMain.STATE_TITLE); }}
