@@ -1,0 +1,19 @@
+package prefab;
+import java.util.Vector;
+import org.newdawn.slick.Color;import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.geom.Point;import org.newdawn.slick.geom.Rectangle;import org.newdawn.slick.geom.Shape;import org.newdawn.slick.state.StateBasedGame;
+import Scenes.GameScene;import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public class Bullet extends GameObject {  Image img; float speed; int degree;  int hp;  Player shootFrom;
+ public Bullet() {  // TODO Auto-generated constructor stub }
+ public Bullet(BasicScene scene) {  super(scene);  // TODO Auto-generated constructor stub }
+ public Bullet(BasicScene scene, float posX, float posY, int tag) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub }
+ public Bullet(BasicScene scene, float posX, float posY, int tag, float speed, int degree, Player shooter) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub    this.speed = speed;  this.degree = degree;  this.zorder = 4;//둘째줄 구름보다는 앞에 오도록  this.hp = 1;//파괴력 선언  this.shootFrom = shooter;//이 총알을 발사한 플레이어    try{      img = new Image("rsc/game/mybullet.png");   img.setCenterOfRotation(0.5f, 0.5f);     }catch(Exception e){   e.printStackTrace();  }    ((GameScene)scene).playSound(4);//발사음
+ }  @Override public void update() {  // TODO Auto-generated method stub
+  Point pos = new Point(posX, posY);  pos = GameScene.getNextPos(posX, posY, degree, speed);  posX = pos.getX();  posY = pos.getY();
+  checkHit();    if(posX<-10 || posX>650 || posY<-10 || posY>490){   //화면을 벗어나면 소멸 요청   scene.removeChild(this);  } }
+ @Override public void render(GameContainer cont, StateBasedGame state, Graphics g) {  // TODO Auto-generated method stub
+  //float scale = 2.0f;    Image _img = img;//.getScaledCopy(scale);    _img.setRotation(degree);  _img.drawCentered(posX,  posY);
+  rect = new Rectangle(    (int)posX-img.getWidth()/2, (int)posY-img.getHeight()/2,    img.getWidth(), img.getHeight());
+  rect = BasicScene.getTransShape(rect, posX, posY, 1.0f, degree);    if(scene.getDebug()){   g.setColor(Color.red);   g.draw(rect);  }   }
+ @Override public void remove() {  // TODO Auto-generated method stub
+ }
+ private void checkHit(){    if( rect==null) return;    Vector<GameObject> enemies = scene.getChildrenByName("ENEMY");    for(int i=0;i<enemies.size();i++){      Enemy temp = (Enemy)enemies.get(i);   if( temp==null ) continue;      Shape eRect = temp.getRect();   if( eRect==null ) continue;      if (rect.intersects(eRect)){        //적과 부딪혔으므로 스파크 이펙트를 발생시킨다    ParticleEffect efct = new ParticleEffect(scene, posX, posY, "rsc/game/eft_spark.png");    scene.addChild(efct);    efct.setStart(3, 3, 2, 1);//프레임 구성이 가로로 3장, 세로로 3장, 프레임 당 딜레이 2카운트, 반복횟수 1회        this.hp = temp.setHit(hp, shootFrom);     if( hp <=0 )//적과 총알이 hp를 상쇄시켜 남은게 없다면 총알은 소멸한다      scene.removeChild(this);    break;   }  } }}
