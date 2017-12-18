@@ -1,0 +1,24 @@
+package prefab;
+import java.util.Random;import java.util.Vector;
+import org.newdawn.slick.Color;import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.geom.Point;import org.newdawn.slick.geom.Shape;import org.newdawn.slick.state.StateBasedGame;
+import Scenes.GameScene;
+import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public class Neuko extends Enemy {
+ Image img; int cnt, tCnt; int step, _step; Random rand = new Random();  public Neuko() {  // TODO Auto-generated constructor stub }
+ public Neuko(BasicScene scene) {  super(scene);  // TODO Auto-generated constructor stub }
+ public Neuko(BasicScene scene, float posX, float posY, int tag) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub
+  try{      img = new Image("rsc/game/enemy2.png");     }catch(Exception e){   e.printStackTrace();  }    this.zorder = 4;  this.isLive = false;    step = 0;  _step = 0;    cnt = 0;  tCnt = 0; }
+ @Override public void setInit(float posX, float posY, int moving) {  // TODO Auto-generated method stub
+  this.posX = posX;  this.posY = posY;    this.degree = 270;  this.speed = 1.0f;    this.hp = 30;    this.isLive = true; }
+ @Override public void update() {  // TODO Auto-generated method stub
+  if(!isLive)   return;    cnt++;    Point pos = new Point(posX, posY);    pos = GameScene.getNextPos(posX, posY, degree, speed);    posX = pos.getX();  posY = pos.getY();    if(step==0 && posX<=400){   //화면 중앙보다 조금 오른쪽에서 정지   this.speed = 0;   step = 1;  }  if(cnt%10==0) {   EBullet1 bullet = new EBullet1(scene, posX, posY, 0, 2.0f, 361 - cnt*2);   bullet.setName("EBULLET");   scene.addChild(bullet);  }      //실드를 투척했으면 다시 되돌아 나간다.  if(step==2 && posX>=680)   scene.removeChild(this); }
+ @Override public void render(GameContainer cont, StateBasedGame state, Graphics g) {  // TODO Auto-generated method stub  if(!isLive)   return;
+  rect = BasicScene.drawClipped(g, img, posX, posY, 36, 50, 0, 0);    if(scene.getDebug()){   g.setColor(Color.red);   g.draw(rect);  } }
+ @Override public int setHit(int damage, Player shooter) {  // TODO Auto-generated method stub    int ret = damage - this.hp;    this.hp -= damage;  if( this.hp<0 ){
+   //HP가 0 미만이 되면 파괴되는 것이 아니고 아이템을 드롭한 후 화면 밖으로 사라진다.   //파괴되었으므로 폭연 이펙트를 그린다//   ParticleEffect efct = new ParticleEffect(scene, posX, posY, "rsc/game/explode.png");//   scene.addChild(efct);//   efct.setScale(2.0f);//   efct.setStart(4, 4, 2, 1);//프레임 구성이 가로로 4장, 세로로 4장, 프레임 당 딜레이 2카운트, 반복횟수 1회//   //   ((GameScene)scene).playSound(2);//파괴//   //   scene.removeChild(this);//네우로이의 HP가 0 이하이므로 소멸 요청을 한다
+   //되돌아가는 세팅   this.degree = 90;   this.speed = 1.0f;   this.setName("NEUKO");//이름을 바꿔서 더 이상 총알을 맞거나 플레이어와 충돌하는 일이 없도록 한다      if( shooter!=null ){        shooter.setMyScore(shooter.getMyScore() + 100);   }
+   //아이템을 생성한다   ShieldItem item = new ShieldItem(scene, posX, posY, 0);   scene.addChild(item);  }    return ret;//총알의 남은 데미지를 돌려준다 }
+ @Override protected void checkHit() {  // TODO Auto-generated method stub
+  if( rect==null) return;    Vector<GameObject> enemies = scene.getChildrenByName("PLAYER");    for(int i=0;i<enemies.size();i++){      Player temp = (Player)enemies.get(i);   if( temp==null ) continue;
+   if(temp.getState()!=1 || temp.isImmortal())//플레이어가 무적이거나 온플레이 상태가 아니면 충돌판단하지 않는다    continue;      Shape eRect = temp.getRect();   if( eRect==null ) continue;      if (rect.intersects(eRect)){        ParticleEffect efct = new ParticleEffect(scene, posX, posY, "rsc/game/eft_spark.png");    scene.addChild(efct);    efct.setStart(3, 3, 2, 1);        temp.setHit(hp);     break;   }  } }
+}
