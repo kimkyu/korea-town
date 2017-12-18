@@ -1,0 +1,17 @@
+package prefab;
+import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.geom.Shape;import org.newdawn.slick.state.StateBasedGame;
+import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public abstract class GameItem extends GameObject {  Image img; int cnt;  float speed; int degree; int nowFrame; Shape rect;
+ public GameItem() {  // TODO Auto-generated constructor stub  super();
+  this.name = "ITEM";//고정  this.zorder = 4;//고정 }
+ public GameItem(BasicScene scene) {  super(scene);  // TODO Auto-generated constructor stub
+  this.name = "ITEM";//고정  this.zorder = 4;//고정 }
+ public GameItem(BasicScene scene, float posX, float posY, int tag) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub
+  this.name = "ITEM";//고정  this.zorder = 4;//고정 }
+ @Override public void update() {  // TODO Auto-generated method stub
+ }
+ @Override public void render(GameContainer cont, StateBasedGame state, Graphics g) {  // TODO Auto-generated method stub
+ }
+ @Override public void remove() {  // TODO Auto-generated method stub
+ }
+ abstract protected Player checkEat();}
