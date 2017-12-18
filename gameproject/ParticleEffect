@@ -1,0 +1,16 @@
+package prefab;
+import org.newdawn.slick.GameContainer;import org.newdawn.slick.Graphics;import org.newdawn.slick.Image;import org.newdawn.slick.state.StateBasedGame;
+import forSlick2D.BasicScene;import forSlick2D.GameObject;
+public class ParticleEffect extends GameObject {  Image img; int width, height; int fWidth, fHeight;//가로 세로 프레임 갯수 int nowFrame;//현재 프레임 int delay;//프레임 별 딜레이 int cnt;//딜레이 계산용 카운터 int repeat;//반복 횟수 boolean isLive;//시작  float scale;
+ public ParticleEffect() {  // TODO Auto-generated constructor stub }
+ public ParticleEffect(BasicScene scene) {  super(scene);  // TODO Auto-generated constructor stub }
+ public ParticleEffect(BasicScene scene, float posX, float posY, int tag) {  super(scene, posX, posY, tag);  // TODO Auto-generated constructor stub }  public ParticleEffect(BasicScene scene, float posX, float posY, String fname){
+  super(scene, posX, posY, 0);    try{   img = new Image(fname);  }catch(Exception e){   e.printStackTrace();  }    scale = 1.0f;  cnt = 0;  isLive = false;//최초에는 잠궈준다. start에서 초기화하면서 true로    this.zorder = 5;//대부분의 캐릭터들보다 위에 오게  }
+ @Override public void update() {  // TODO Auto-generated method stub    if(!isLive)   return;
+  cnt++;  if(cnt%delay==0){//딜레이단위가 되면   nowFrame++;//프레임을 진행   if(nowFrame==fWidth*fHeight){//마지막 프레임을 넘어섰다면        repeat--;//반복 횟수를 1 감소    if(repeat==0){//반복 횟수가 0이 되었으면      isLive = false;//갱신을 중지하고     scene.removeChild(this);//소멸 요청    }else     nowFrame = 0;//아직 반복 횟수가 남았으므로 처음부터 다시   }  } }
+ @Override public void render(GameContainer cont, StateBasedGame state, Graphics g) {  // TODO Auto-generated method stub
+  if(!isLive)   return;   //이펙트에 확/축을 적용할 경우에 쓰이는 정보  float _width = width * scale;  float _height = height * scale;    Image _img = img.getScaledCopy(scale);    BasicScene.drawClipped(g, _img, posX, posY, (int)_width, (int)_height,    nowFrame%fWidth, nowFrame/fWidth);    //예를 들어 3*3으로 배열되어 있고 (fWidth=3, fHeight=3)  //nowFrame이 5라면,  //nowFrame%fWidth = 5%3 = 2  //nowFrame/fWidth = 5/3 = 1  //가로로 0, 1, 2 번째, 세로로 0, 1번째 위치에 있는 그림이 출력해 줄 그림이라는 의미. }
+ @Override public void remove() {  // TODO Auto-generated method stub
+ }
+ public void setScale(float scale){    this.scale = scale; }  public void setStart(int fWidth, int fHeight, int delay, int repeat){    boolean isOk = true;    if(fWidth<=0) isOk = false;  if(fHeight<=0) isOk = false;  if(delay<=0) isOk = false;  if(repeat<=0) isOk = false;    if(!isOk)   return;//수치에 부적절한 수치가 있으면 스타트하지 않는다
+      nowFrame = 0;    this.fWidth = fWidth;  this.fHeight= fHeight;  this.delay = delay;  this.repeat = repeat;    width = img.getWidth() / fWidth;  height = img.getHeight() / fHeight;    isLive = true;   }}
